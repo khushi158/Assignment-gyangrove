@@ -1,34 +1,33 @@
 import React, { useState } from 'react';
 import supabase from '../../supabase';
+import { TextField, Button, Typography, CircularProgress, Container, Box } from '@mui/material';
 
 const Signup = () => {
-  // States for user input
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  
-  // Handle form submission
+  const [success, setSuccess] = useState(false);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setSuccess(false);
 
-    // Signup using Supabase
     try {
       const { user, error } = await supabase.auth.signUp({
         email,
-        password
+        password,
       });
-      
+
       if (error) {
         throw error;
       }
-      
-      // Handle success
+
+      setSuccess(true);
       alert('Signup successful! Please check your email for confirmation.');
     } catch (error) {
-      // Handle error
       setError(error.message);
     } finally {
       setLoading(false);
@@ -36,93 +35,126 @@ const Signup = () => {
   };
 
   return (
-    <div style={styles.container}>
-      <h2>Sign Up</h2>
-      <form onSubmit={handleSubmit} style={styles.form}>
-        <div style={styles.inputGroup}>
-          <label htmlFor="email">Email</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            style={styles.input}
-          />
-        </div>
-        
-        <div style={styles.inputGroup}>
-          <label htmlFor="password">Password</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            style={styles.input}
-          />
-        </div>
+    <Box
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100vh',
+        backgroundColor: '#f5f5f5', // optional: light background color
+      }}
+    >
+      <Container maxWidth="sm">
+        <Box sx={styles.box}>
+          <Typography variant="h4" sx={styles.heading}>Sign Up</Typography>
 
-        {error && <p style={styles.error}>{error}</p>}
-        
-        <button type="submit" disabled={loading} style={styles.submitButton}>
-          {loading ? 'Signing Up...' : 'Sign Up'}
-        </button>
-      </form>
-      
-      <p style={styles.footer}>
-        Already have an account? <a href="/signin" style={styles.link}>Login</a>
-      </p>
-    </div>
+          <form onSubmit={handleSubmit} style={styles.form}>
+            <TextField
+              label="Email"
+              variant="outlined"
+              fullWidth
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              sx={styles.input}
+              error={!!error}
+              helperText={error ? error : ''}
+            />
+
+            <TextField
+              label="Password"
+              variant="outlined"
+              type="password"
+              fullWidth
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              sx={styles.input}
+              error={!!error}
+              helperText={error ? error : ''}
+            />
+
+            {success && (
+              <Typography color="success.main" sx={styles.success}>
+                Signup successful! 🎉
+              </Typography>
+            )}
+
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              color="primary"
+              sx={styles.submitButton}
+              disabled={loading}
+            >
+              {loading ? <CircularProgress size={24} sx={styles.loader} /> : 'Sign Up'}
+            </Button>
+          </form>
+
+          <Typography sx={styles.footer}>
+            Already have an account?{' '}
+            <a href="/signin" style={styles.link}>
+              Login
+            </a>
+          </Typography>
+        </Box>
+      </Container>
+    </Box>
   );
 };
 
 const styles = {
-  container: {
-    maxWidth: '400px',
-    margin: '0 auto',
-    padding: '20px',
-    border: '1px solid #ccc',
-    borderRadius: '8px',
-    boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
+  box: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '30px',
+    borderRadius: '10px',
+    boxShadow: 3,
+    backgroundColor: '#fff',
+  },
+  heading: {
+    marginBottom: '20px',
+    textAlign: 'center',
   },
   form: {
     display: 'flex',
     flexDirection: 'column',
-  },
-  inputGroup: {
-    marginBottom: '15px',
-  },
-  input: {
-    padding: '10px',
-    fontSize: '16px',
-    border: '1px solid #ccc',
-    borderRadius: '4px',
+    gap: '15px',
     width: '100%',
   },
+  input: {
+    '& .MuiOutlinedInput-root': {
+      borderRadius: '8px',
+    },
+  },
   submitButton: {
-    padding: '10px',
+    marginTop: '15px',
+    padding: '12px',
     fontSize: '16px',
-    backgroundColor: '#007bff',
-    color: 'white',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: 'pointer',
+    '&:disabled': {
+      backgroundColor: '#a1c4fd',
+    },
+  },
+  loader: {
+    color: '#fff',
   },
   footer: {
+    marginTop: '15px',
     textAlign: 'center',
-    marginTop: '20px',
+    fontSize: '14px',
+    color: '#555',
   },
   link: {
     color: '#007bff',
     textDecoration: 'none',
   },
-  error: {
-    color: 'red',
-    fontSize: '14px',
-  }
+  success: {
+    textAlign: 'center',
+    marginTop: '10px',
+  },
 };
 
 export default Signup;

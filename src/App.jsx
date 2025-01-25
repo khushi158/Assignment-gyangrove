@@ -1,37 +1,33 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom"; // Import
-import Signin from './Components/Authentication/Signin';
-import Signup from './Components/Authentication/Signup';
-import Home from './Components/Home/Home';
-import Navbar from './Components/NavBar';
-import Settings from './Components/Settings';
-
-
+import { useEffect, useState } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Signin from "./Components/Authentication/Signin";
+import Signup from "./Components/Authentication/Signup";
+import Home from "./Components/Home/Home";
+import Navbar from "./Components/NavBar";
 
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-
-
-
-
+  useEffect(() => {
+    const userEmail = localStorage.getItem("userEmail");
+    setIsAuthenticated(!!userEmail);
+  }, []);
 
   return (
     <div>
-        <Navbar/>
-             <Routes>
-              <Route path='/home' element={<Home/>} />
-                  <Route path='/Signup' element={<Signup/>} />
-                  <Route path='/Signin' element={<Signin/>} />
-                  <Route path='/Settings' element={<Settings/>} />
-              </Routes>
+         {localStorage.getItem('userEmail') && <Navbar isAuthenticated={isAuthenticated} setIsAuthenticated={setIsAuthenticated}/>}
+      <Routes>
+ 
+            <Route path="/home" element={<Home isAuthenticated={isAuthenticated} setIsAuthenticated={setIsAuthenticated}/>} />
+          
+       
+            <Route path="/signin" element={<Signin isAuthenticated={isAuthenticated} setIsAuthenticated={setIsAuthenticated}/>} />
+            <Route path="/signup" element={<Signup />} />
         
-
+      </Routes>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
